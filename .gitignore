@@ -4,3 +4,6 @@ token.json
 node_modules/
 .next/
 .env
+.venv/
+*.pyc
+__pycache__/
