@@ -17,8 +17,8 @@ export interface Violation {
   details?: Record<string, unknown>;
 }
 
-export async function validateReschedule(input: ValidationInput): Promise<Violation[]> {
-  const policy = loadPolicy();
+export async function validateReschedule(input: ValidationInput, overridePolicy?: GuardrailPolicy): Promise<Violation[]> {
+  const policy = overridePolicy || loadPolicy();
   const violations: Violation[] = [];
 
   // 1) Check ≥24h notice
@@ -47,7 +47,17 @@ async function checkNoticePeriod(
   policy: GuardrailPolicy
 ): Promise<Violation | null> {
   const evalTimeZone = policy.policyTimeZone || input.userTimeZone || 'UTC';
-  const nowServer = DateTime.now().setZone(evalTimeZone);
+  
+  // Use frozen time if available, otherwise use current time
+  let nowServer: DateTime;
+  try {
+    const { now } = await import('@/evals/runner/clock');
+    nowServer = now().setZone(evalTimeZone);
+  } catch {
+    // Fallback to current time if clock module is not available
+    nowServer = DateTime.now().setZone(evalTimeZone);
+  }
+  
   const start = DateTime.fromISO(input.proposedStartISO);
   
   const diffHours = start.diff(nowServer, 'hours').hours;

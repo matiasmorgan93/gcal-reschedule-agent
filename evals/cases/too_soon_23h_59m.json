@@ -1,0 +1,29 @@
+{
+  "name": "too_soon_23h_59m",
+  "nowISO": "2025-03-10T08:00:00-04:00",
+  "policyTimeZone": "America/New_York",
+  "businessHoursByWeekday": {
+    "1": {"start": "09:00", "end": "17:00"},
+    "2": {"start": "09:00", "end": "17:00"},
+    "3": {"start": "09:00", "end": "17:00"},
+    "4": {"start": "09:00", "end": "17:00"},
+    "5": {"start": "09:00", "end": "17:00"}
+  },
+  "minNoticeHours": 24,
+  "calendarId": "primary",
+  "calendarsToCheck": ["primary"],
+  "treatTentativeAsBusy": true,
+  "ignoreDeclined": true,
+  "originalEvent": {
+    "startISO": "2025-03-12T10:00:00-04:00",
+    "endISO": "2025-03-12T11:00:00-04:00",
+    "timeZone": "America/New_York"
+  },
+  "proposedStartISO": "2025-03-11T07:59:00-04:00",
+  "proposedEndISO": "2025-03-11T08:59:00-04:00",
+  "mockFreeBusy": [],
+  "expected": {
+    "pass": false,
+    "violations": ["NOTICE_TOO_SOON"]
+  }
+}

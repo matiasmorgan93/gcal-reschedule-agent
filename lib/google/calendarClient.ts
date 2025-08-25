@@ -21,6 +21,18 @@ export interface GCalEvent {
 }
 
 export async function getCalendarClient(accessToken: string) {
+  // Check if we're in test mode with mocks
+  try {
+    const { getMockData } = await import('@/evals/runner/google-mocks');
+    const mockData = getMockData();
+    if (mockData) {
+      const { createMockCalendarClient } = await import('@/evals/runner/google-mocks');
+      return createMockCalendarClient();
+    }
+  } catch {
+    // Mock module not available, use real client
+  }
+  
   const oauth2Client = new google.auth.OAuth2();
   oauth2Client.setCredentials({ access_token: accessToken });
   

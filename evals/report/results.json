@@ -1,0 +1,237 @@
+{
+  "summary": {
+    "total": 14,
+    "passed": 12,
+    "failed": 2,
+    "flakeDetected": true
+  },
+  "violations": {
+    "NOTICE_TOO_SOON": 2,
+    "BUSINESS_HOURS_OUTSIDE": 6,
+    "TIME_CONFLICT": 4
+  },
+  "results": [
+    {
+      "caseName": "allday_event_blocks_busy",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "boundary_exactly_24h_notice",
+      "unitTest": {
+        "passed": true,
+        "violations": []
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": []
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "conflict_busy_event_overlap",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "conflict_declined_ignored",
+      "unitTest": {
+        "passed": true,
+        "violations": []
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": []
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "conflict_tentative_counts_as_busy",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "cross_tz_user_vs_policy",
+      "unitTest": {
+        "passed": true,
+        "violations": []
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": []
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "dst_fall_back_overlap",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE",
+          "NOTICE_TOO_SOON"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE",
+          "NOTICE_TOO_SOON"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "dst_spring_forward_boundary",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "happy_within_hours_no_conflict",
+      "unitTest": {
+        "passed": true,
+        "violations": []
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": []
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "multi_calendar_conflict",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
+      },
+      "apiTest": {
+        "passed": false,
+        "violations": []
+      },
+      "overallPassed": false,
+      "flakeDetected": true
+    },
+    {
+      "caseName": "outside_business_hours_end",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "apiTest": {
+        "passed": false,
+        "violations": []
+      },
+      "overallPassed": false,
+      "flakeDetected": true
+    },
+    {
+      "caseName": "outside_business_hours_start",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "too_soon_23h_59m",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE",
+          "NOTICE_TOO_SOON"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE",
+          "NOTICE_TOO_SOON"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    },
+    {
+      "caseName": "weekend_no_hours_defined",
+      "unitTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "apiTest": {
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
+      },
+      "overallPassed": true,
+      "flakeDetected": false
+    }
+  ]
+}

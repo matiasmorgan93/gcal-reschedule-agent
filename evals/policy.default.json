@@ -1,0 +1,15 @@
+{
+  "minNoticeHours": 24,
+  "policyTimeZone": "America/New_York",
+  "businessHoursByWeekday": {
+    "1": {"start": "09:00", "end": "17:00"},
+    "2": {"start": "09:00", "end": "17:00"},
+    "3": {"start": "09:00", "end": "17:00"},
+    "4": {"start": "09:00", "end": "17:00"},
+    "5": {"start": "09:00", "end": "17:00"}
+  },
+  "calendarsToCheck": ["primary"],
+  "treatTentativeAsBusy": true,
+  "ignoreDeclined": true,
+  "conflictMethod": "freebusy"
+}
