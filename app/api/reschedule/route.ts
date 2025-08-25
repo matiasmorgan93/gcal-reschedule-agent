@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
+import { validateReschedule, ValidationInput } from '@/lib/guardrails/validateReschedule'
+import { getEvent } from '@/lib/google/calendarClient'
 
 export async function POST(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')
@@ -9,21 +11,31 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { eventId, newDate, newTime, keepDuration } = await request.json()
+    const { eventId, newDate, newTime, keepDuration, userTimeZone } = await request.json()
+
+    if (!eventId || !newDate || !newTime) {
+      return NextResponse.json({ 
+        error: 'Missing required fields: eventId, newDate, newTime' 
+      }, { status: 400 })
+    }
 
     const oauth2Client = new google.auth.OAuth2()
     oauth2Client.setCredentials({ access_token: accessToken.value })
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+    const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary'
 
     // Get the current event to preserve its duration
-    const currentEvent = await calendar.events.get({
-      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
-      eventId
-    })
+    const currentEvent = await getEvent(calendar, calendarId, eventId)
 
-    const currentStart = new Date(currentEvent.data.start?.dateTime || currentEvent.data.start?.date!)
-    const currentEnd = new Date(currentEvent.data.end?.dateTime || currentEvent.data.end?.date!)
+    if (!currentEvent.start?.dateTime && !currentEvent.start?.date) {
+      return NextResponse.json({ 
+        error: 'Cannot reschedule all-day events' 
+      }, { status: 400 })
+    }
+
+    const currentStart = new Date(currentEvent.start.dateTime || currentEvent.start.date!)
+    const currentEnd = new Date(currentEvent.end.dateTime || currentEvent.end.date!)
     const duration = currentEnd.getTime() - currentStart.getTime()
 
     // Calculate new start and end times
@@ -32,18 +44,42 @@ export async function POST(request: NextRequest) {
       ? new Date(newStart.getTime() + duration)
       : new Date(`${newDate}T${newTime}`)
 
+    // Add timezone information
+    const timeZone = userTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone
+    const proposedStartISO = newStart.toISOString()
+    const proposedEndISO = newEnd.toISOString()
+
+    // Validate the reschedule request
+    const validationInput: ValidationInput = {
+      originalEvent: currentEvent,
+      proposedStartISO,
+      proposedEndISO,
+      userTimeZone: timeZone,
+      calendarId,
+      accessToken: accessToken.value,
+    }
+
+    const violations = await validateReschedule(validationInput)
+
+    if (violations.length > 0) {
+      return NextResponse.json({
+        error: 'Reschedule request violates guardrails',
+        violations,
+      }, { status: 400 })
+    }
+
     // Update the event
     const updatedEvent = await calendar.events.patch({
-      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      calendarId,
       eventId,
       requestBody: {
         start: {
           dateTime: newStart.toISOString(),
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          timeZone: timeZone
         },
         end: {
           dateTime: newEnd.toISOString(),
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          timeZone: timeZone
         }
       }
     })

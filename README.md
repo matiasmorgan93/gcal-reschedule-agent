@@ -9,6 +9,7 @@ A beautiful, modern web application for rescheduling Google Calendar events with
 - 🎨 **Modern UI Design** - Beautiful, responsive interface
 - ⚡ **Fast & Responsive** - Built with Next.js for optimal performance
 - 🔄 **Smart Rescheduling** - Keep event duration or set custom times
+- 🛡️ **Guardrails System** - Server-enforced validation for business hours, notice periods, and conflicts
 - 📱 **Mobile Friendly** - Works perfectly on all devices
 
 ## Quick Start
@@ -96,6 +97,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `GET /api/auth/status` - Check authentication status
 - `GET /api/events` - Fetch calendar events
 - `POST /api/reschedule` - Reschedule an event
+- `POST /api/validate-reschedule` - Validate reschedule request against guardrails
 
 ## Development
 
@@ -114,6 +116,12 @@ npm start
 
 # Run linting
 npm run lint
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ## Environment Variables
@@ -123,6 +131,7 @@ npm run lint
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | Yes |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Yes |
 | `GOOGLE_REDIRECT_URI` | OAuth redirect URI | Yes |
+| `GUARDRAILS_JSON` | Guardrails configuration (JSON string) | No |
 
 ## Deployment
 
@@ -140,6 +149,62 @@ The app can be deployed to any platform that supports Next.js:
 - Railway
 - DigitalOcean App Platform
 - AWS Amplify
+
+## Guardrails System
+
+The application includes a comprehensive guardrails system that enforces business rules for event rescheduling. All validations are performed both on the client-side (for immediate feedback) and server-side (for security).
+
+### Guardrail Rules
+
+1. **Business Hours** - Events must be scheduled within configured business hours for each weekday
+2. **Notice Period** - Events must be scheduled with at least 24 hours advance notice (configurable)
+3. **No Conflicts** - Events must not conflict with existing calendar events
+
+### Configuration
+
+Guardrails can be configured via the `GUARDRAILS_JSON` environment variable:
+
+```json
+{
+  "minNoticeHours": 24,
+  "policyTimeZone": "America/New_York",
+  "businessHoursByWeekday": {
+    "1": {"start": "09:00", "end": "17:00"},
+    "2": {"start": "09:00", "end": "17:00"},
+    "3": {"start": "09:00", "end": "17:00"},
+    "4": {"start": "09:00", "end": "17:00"},
+    "5": {"start": "09:00", "end": "17:00"}
+  },
+  "calendarsToCheck": ["primary", "work@company.com"],
+  "treatTentativeAsBusy": true,
+  "ignoreDeclined": true,
+  "conflictMethod": "freebusy"
+}
+```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `minNoticeHours` | number | 24 | Minimum hours of advance notice required |
+| `policyTimeZone` | string | undefined | IANA timezone for policy evaluation |
+| `businessHoursByWeekday` | object | Mon-Fri 9-5 | Business hours by weekday (0=Sunday) |
+| `calendarsToCheck` | string[] | [] | Additional calendars to check for conflicts |
+| `treatTentativeAsBusy` | boolean | true | Whether tentative events block scheduling |
+| `ignoreDeclined` | boolean | true | Whether declined events block scheduling |
+| `conflictMethod` | string | "freebusy" | Method for conflict detection ("freebusy" or "list") |
+
+### Validation Flow
+
+1. **Client-side validation** - Real-time feedback as user selects times
+2. **Server-side validation** - Final enforcement before calendar update
+3. **UI feedback** - Clear indication of validation status and violations
+
+### Error Codes
+
+- `BUSINESS_HOURS_OUTSIDE` - Event time is outside configured business hours
+- `NOTICE_TOO_SOON` - Insufficient advance notice for the event
+- `TIME_CONFLICT` - Event conflicts with existing calendar events
 
 ## Contributing
 

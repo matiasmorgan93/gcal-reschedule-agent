@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
+import { GuardrailPanel, Violation } from "@/components/GuardrailPanel"
 
 interface Event {
   id: string
@@ -28,10 +29,14 @@ export default function CalendarRescheduler() {
   const [isRescheduling, setIsRescheduling] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEventData, setSelectedEventData] = useState<Event | null>(null)
+  const [violations, setViolations] = useState<Violation[]>([])
+  const [isValidating, setIsValidating] = useState(false)
+  const [userTimeZone, setUserTimeZone] = useState<string>('')
 
   // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus()
+    setUserTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
   }, [])
 
   const checkAuthStatus = async () => {
@@ -67,6 +72,35 @@ export default function CalendarRescheduler() {
     }
   }
 
+  const validateProposedTime = async () => {
+    if (!selectedEventData || !newDate || !newTime) return
+
+    setIsValidating(true)
+    try {
+      const response = await fetch('/api/validate-reschedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventId: selectedEventData.id,
+          newDate,
+          newTime,
+          keepDuration,
+          userTimeZone,
+        }),
+      })
+
+      const data = await response.json()
+      setViolations(data.violations || [])
+    } catch (error) {
+      console.error('Validation failed:', error)
+      setViolations([])
+    } finally {
+      setIsValidating(false)
+    }
+  }
+
   const handleReschedule = async () => {
     if (!selectedEventData || !newDate || !newTime) return
 
@@ -82,6 +116,7 @@ export default function CalendarRescheduler() {
           newDate,
           newTime,
           keepDuration,
+          userTimeZone,
         }),
       })
 
@@ -89,7 +124,12 @@ export default function CalendarRescheduler() {
         setIsRescheduled(true)
         await loadEvents() // Refresh events
       } else {
-        throw new Error('Failed to reschedule')
+        const data = await response.json()
+        if (data.violations) {
+          setViolations(data.violations)
+        } else {
+          throw new Error('Failed to reschedule')
+        }
       }
     } catch (error) {
       console.error('Reschedule failed:', error)
@@ -105,6 +145,7 @@ export default function CalendarRescheduler() {
     setNewTime("")
     setKeepDuration(true)
     setSelectedEventData(null)
+    setViolations([])
   }
 
   const handleEventSelect = (eventId: string) => {
@@ -330,7 +371,10 @@ export default function CalendarRescheduler() {
                       id="new-date"
                       type="date"
                       value={newDate}
-                      onChange={(e) => setNewDate(e.target.value)}
+                      onChange={(e) => {
+                        setNewDate(e.target.value)
+                        setViolations([]) // Clear violations when user changes input
+                      }}
                       className="mt-2"
                     />
                   </div>
@@ -342,11 +386,44 @@ export default function CalendarRescheduler() {
                       id="new-time"
                       type="time"
                       value={newTime}
-                      onChange={(e) => setNewTime(e.target.value)}
+                      onChange={(e) => {
+                        setNewTime(e.target.value)
+                        setViolations([]) // Clear violations when user changes input
+                      }}
                       className="mt-2"
                     />
                   </div>
                 </div>
+
+                {/* Guardrail Validation Panel */}
+                {(selectedEventData && newDate && newTime) && (
+                  <GuardrailPanel 
+                    violations={violations} 
+                    isLoading={isValidating}
+                  />
+                )}
+
+                {/* Validate Button */}
+                {(selectedEventData && newDate && newTime) && (
+                  <Button
+                    onClick={validateProposedTime}
+                    disabled={isValidating}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {isValidating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mr-2" />
+                        Validating...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Validate Proposed Time
+                      </>
+                    )}
+                  </Button>
+                )}
 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -361,7 +438,7 @@ export default function CalendarRescheduler() {
 
                 <Button
                   onClick={handleReschedule}
-                  disabled={!selectedEvent || !newDate || !newTime || isRescheduling}
+                  disabled={!selectedEvent || !newDate || !newTime || isRescheduling || violations.length > 0}
                   className="w-full h-12 text-base font-medium"
                 >
                   {isRescheduling ? (
