@@ -45,10 +45,11 @@ export default function CalendarRescheduler() {
       const data = await response.json()
       setIsAuthenticated(data.authenticated)
       if (data.authenticated) {
-        loadEvents()
+        await loadEvents()
       }
     } catch (error) {
       console.error('Auth check failed:', error)
+      setIsAuthenticated(false)
     } finally {
       setIsLoading(false)
     }
@@ -61,6 +62,7 @@ export default function CalendarRescheduler() {
       setEvents(data.events || [])
     } catch (error) {
       console.error('Failed to load events:', error)
+      setEvents([])
     }
   }
 
