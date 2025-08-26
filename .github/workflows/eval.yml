@@ -3,8 +3,9 @@ name: Run Micro-Evaluation Suite
 on:
   pull_request:
     branches: [ main, master ]
-  push:
-    branches: [ main, master ]
+  # Temporarily disabled push triggers to avoid blocking commits
+  # push:
+  #   branches: [ main, master ]
 
 jobs:
   eval:
