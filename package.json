@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "eval": "tsx evals/runner/run-evals.ts",
-    "eval:update": "tsx evals/runner/run-evals.ts && open evals/report/results.md"
+    "eval:update": "tsx evals/runner/run-evals.ts && open evals/report/results.md",
+    "eval:micro": "node tests/micro-eval.mjs"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
