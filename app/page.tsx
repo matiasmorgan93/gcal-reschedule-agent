@@ -269,16 +269,30 @@ export default function CalendarRescheduler() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-3">
-                <Calendar className="w-6 h-6 text-primary" />
+          <div className="relative mb-8">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-3">
+                  <Calendar className="w-6 h-6 text-primary" />
+                </div>
+                <h1 className="text-3xl font-bold text-foreground">Calendar Rescheduler</h1>
               </div>
-              <h1 className="text-3xl font-bold text-foreground">Calendar Rescheduler</h1>
+              <p className="text-muted-foreground text-lg">
+                Effortlessly reschedule your Google Calendar events with AI assistance
+              </p>
             </div>
-            <p className="text-muted-foreground text-lg">
-              Effortlessly reschedule your Google Calendar events with AI assistance
-            </p>
+            
+            {/* Sign Out Button - Top Right */}
+            <div className="absolute top-0 right-0">
+              <Button 
+                onClick={() => window.location.href = '/api/auth/logout'} 
+                variant="outline" 
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6">
