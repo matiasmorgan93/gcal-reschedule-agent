@@ -108,6 +108,15 @@ export default function CalendarRescheduler() {
 
     setIsRescheduling(true)
     try {
+      // Calculate new start and end times
+      const newStart = new Date(`${newDate}T${newTime}:00`);
+      const currentStart = new Date(selectedEventData.start.dateTime || selectedEventData.start.date!);
+      const currentEnd = new Date(selectedEventData.end.dateTime || selectedEventData.end.date!);
+      const duration = currentEnd.getTime() - currentStart.getTime();
+      const newEnd = keepDuration 
+        ? new Date(newStart.getTime() + duration)
+        : new Date(`${newDate}T${newTime}:00`);
+
       const response = await fetch('/api/reschedule', {
         method: 'POST',
         headers: {
@@ -115,10 +124,9 @@ export default function CalendarRescheduler() {
         },
         body: JSON.stringify({
           eventId: selectedEventData.id,
-          newDate,
-          newTime,
-          keepDuration,
-          userTimeZone,
+          newStartISO: newStart.toISOString(),
+          newEndISO: newEnd.toISOString(),
+          timeZone: userTimeZone,
         }),
       })
 
@@ -127,8 +135,9 @@ export default function CalendarRescheduler() {
         await loadEvents() // Refresh events
       } else {
         const data = await response.json()
-        if (data.violations) {
-          setViolations(data.violations)
+        if (data.error) {
+          // Show policy error message
+          setViolations([{ code: data.error, message: data.error }])
         } else {
           throw new Error('Failed to reschedule')
         }
