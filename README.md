@@ -11,6 +11,14 @@ A modern web application for rescheduling Google Calendar events with intelligen
 - **Multi-Calendar Support** - Check availability across multiple calendars
 - **Timezone Awareness** - Handles DST transitions and cross-timezone scenarios
 
+## Demos
+
+### **1. Agent demo** 
+https://www.loom.com/share/6dda9645279943b2aa64c3215bbb2c28
+
+### 2. Simulation suite demo
+[need to record it]
+
 ## Quick Start
 
 ### Prerequisites
