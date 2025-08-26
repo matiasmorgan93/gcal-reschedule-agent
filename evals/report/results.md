@@ -1,17 +1,13 @@
-# Rescheduler Micro-Eval – 12/14 passing
-
-⚠️ **2 test(s) failed**
-
-🚨 **Flake detected**: Unit and API tests disagree
+# Rescheduler Micro-Eval – 14/14 passing
 
 ## Summary
 
 | Metric | Count |
 |--------|-------|
 | Total Tests | 14 |
-| Passed | 12 |
-| Failed | 2 |
-| Flake Detected | Yes |
+| Passed | 14 |
+| Failed | 0 |
+| Flake Detected | No |
 
 ## Violations by Type
 
@@ -34,23 +30,8 @@
 | dst_fall_back_overlap     | ✅    | ✅    | pass                 |
 | dst_spring_forward_boundary | ✅    | ✅    | pass                 |
 | happy_within_hours_no_conflict | ✅    | ✅    | pass                 |
-| multi_calendar_conflict   | ✅    | ❌    | fail (FLAKE)         |
-| outside_business_hours_end | ✅    | ❌    | fail (FLAKE)         |
+| multi_calendar_conflict   | ✅    | ✅    | pass                 |
+| outside_business_hours_end | ✅    | ✅    | pass                 |
 | outside_business_hours_start | ✅    | ✅    | pass                 |
 | too_soon_23h_59m          | ✅    | ✅    | pass                 |
 | weekend_no_hours_defined  | ✅    | ✅    | pass                 |
-
-## Failed Test Details
-
-### multi_calendar_conflict
-
-**API Test Failed:**
-
-**Flake Detected:** Unit and API tests produced different results
-
-### outside_business_hours_end
-
-**API Test Failed:**
-
-**Flake Detected:** Unit and API tests produced different results
-

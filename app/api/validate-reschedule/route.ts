@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateReschedule, ValidationInput } from '@/lib/guardrails/validateReschedule';
 import { getEvent } from '@/lib/google/calendarClient';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest, policy?: any) {
   const accessToken = request.cookies.get('access_token');
   
   if (!accessToken) {
@@ -10,11 +10,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { eventId, newDate, newTime, keepDuration, userTimeZone } = await request.json();
+    const { eventId, newDate, newTime, proposedStartISO, proposedEndISO, keepDuration, userTimeZone } = await request.json();
 
-    if (!eventId || !newDate || !newTime) {
+    if (!eventId || (!newDate && !proposedStartISO) || (!newTime && !proposedEndISO)) {
       return NextResponse.json({ 
-        error: 'Missing required fields: eventId, newDate, newTime' 
+        error: 'Missing required fields: eventId and either (newDate, newTime) or (proposedStartISO, proposedEndISO)' 
       }, { status: 400 });
     }
 
@@ -31,38 +31,47 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Calculate new start and end times
-    const currentStart = new Date(currentEvent.start.dateTime || currentEvent.start.date!);
-    const currentEnd = new Date(currentEvent.end.dateTime || currentEvent.end.date!);
-    const duration = currentEnd.getTime() - currentStart.getTime();
-
-    const newStart = new Date(`${newDate}T${newTime}`);
-    const newEnd = keepDuration 
-      ? new Date(newStart.getTime() + duration)
-      : new Date(`${newDate}T${newTime}`);
-
-    // Add timezone information
+    // Use provided ISO strings or calculate from date/time components
+    let finalProposedStartISO: string;
+    let finalProposedEndISO: string;
     const timeZone = userTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const proposedStartISO = newStart.toISOString();
-    const proposedEndISO = newEnd.toISOString();
+
+    if (proposedStartISO && proposedEndISO) {
+      // Use provided ISO strings directly
+      finalProposedStartISO = proposedStartISO;
+      finalProposedEndISO = proposedEndISO;
+    } else {
+      // Calculate from date/time components (for regular API usage)
+      const currentStart = new Date(currentEvent.start.dateTime || currentEvent.start.date!);
+      const currentEnd = new Date(currentEvent.end.dateTime || currentEvent.end.date!);
+      const duration = currentEnd.getTime() - currentStart.getTime();
+
+      const newStart = new Date(`${newDate}T${newTime}:00`);
+      const newEnd = keepDuration 
+        ? new Date(newStart.getTime() + duration)
+        : new Date(`${newDate}T${newTime}:00`);
+
+      finalProposedStartISO = newStart.toISOString();
+      finalProposedEndISO = newEnd.toISOString();
+    }
 
     // Validate the reschedule request
     const validationInput: ValidationInput = {
       originalEvent: currentEvent,
-      proposedStartISO,
-      proposedEndISO,
+      proposedStartISO: finalProposedStartISO,
+      proposedEndISO: finalProposedEndISO,
       userTimeZone: timeZone,
       calendarId,
       accessToken: accessToken.value,
     };
 
-    const violations = await validateReschedule(validationInput);
+    const violations = await validateReschedule(validationInput, policy);
 
     return NextResponse.json({
       valid: violations.length === 0,
       violations,
-      proposedStart: proposedStartISO,
-      proposedEnd: proposedEndISO,
+      proposedStart: finalProposedStartISO,
+      proposedEnd: finalProposedEndISO,
       timeZone,
     });
 

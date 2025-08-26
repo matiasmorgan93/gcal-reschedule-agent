@@ -1,9 +1,9 @@
 {
   "summary": {
     "total": 14,
-    "passed": 12,
-    "failed": 2,
-    "flakeDetected": true
+    "passed": 14,
+    "failed": 0,
+    "flakeDetected": false
   },
   "violations": {
     "NOTICE_TOO_SOON": 2,
@@ -159,11 +159,13 @@
         ]
       },
       "apiTest": {
-        "passed": false,
-        "violations": []
+        "passed": true,
+        "violations": [
+          "TIME_CONFLICT"
+        ]
       },
-      "overallPassed": false,
-      "flakeDetected": true
+      "overallPassed": true,
+      "flakeDetected": false
     },
     {
       "caseName": "outside_business_hours_end",
@@ -174,11 +176,13 @@
         ]
       },
       "apiTest": {
-        "passed": false,
-        "violations": []
+        "passed": true,
+        "violations": [
+          "BUSINESS_HOURS_OUTSIDE"
+        ]
       },
-      "overallPassed": false,
-      "flakeDetected": true
+      "overallPassed": true,
+      "flakeDetected": false
     },
     {
       "caseName": "outside_business_hours_start",

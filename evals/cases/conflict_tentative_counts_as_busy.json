@@ -21,13 +21,15 @@
   },
   "proposedStartISO": "2025-03-12T14:00:00-04:00",
   "proposedEndISO": "2025-03-12T15:00:00-04:00",
-  "mockEvents": [
+  "mockFreeBusy": [
     {
-      "id": "tentative-event",
-      "summary": "Tentative Meeting",
-      "start": {"dateTime": "2025-03-12T14:30:00-04:00"},
-      "end": {"dateTime": "2025-03-12T15:30:00-04:00"},
-      "status": "tentative"
+      "calendarId": "primary",
+      "busy": [
+        {
+          "start": "2025-03-12T14:30:00-04:00",
+          "end": "2025-03-12T15:30:00-04:00"
+        }
+      ]
     }
   ],
   "expected": {

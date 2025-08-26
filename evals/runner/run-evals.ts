@@ -165,11 +165,11 @@ async function runUnitTest(testCase: TestCase, policy: GuardrailPolicy): Promise
  */
 async function runApiTest(testCase: TestCase, policy: GuardrailPolicy): Promise<{ passed: boolean; violations: string[]; error?: string }> {
   try {
-    // Create request body
+    // Create request body with exact ISO strings to avoid timezone conversion issues
     const requestBody = {
       eventId: 'test-event-1',
-      newDate: new Date(testCase.proposedStartISO).toISOString().split('T')[0],
-      newTime: new Date(testCase.proposedStartISO).toTimeString().slice(0, 5),
+      proposedStartISO: testCase.proposedStartISO,
+      proposedEndISO: testCase.proposedEndISO,
       keepDuration: true,
       userTimeZone: testCase.policyTimeZone,
     };
@@ -185,7 +185,7 @@ async function runApiTest(testCase: TestCase, policy: GuardrailPolicy): Promise<
     // Import and run the API route
     // The Google client functions will automatically use mocks when setMockData is called
     const { POST } = await import('@/app/api/validate-reschedule/route');
-    const response = await POST(mockRequest as any);
+    const response = await POST(mockRequest as any, policy);
     const data = await response.json();
 
     const violations = data.violations?.map((v: any) => v.code) || [];

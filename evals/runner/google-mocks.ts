@@ -68,7 +68,7 @@ export async function mockCheckFreeBusy(
   const results: Array<{ calendarId: string; busy: Array<{ start: string; end: string }> }> = [];
 
   for (const calendarId of calendarIds) {
-    const mockCalendar = currentMock.mockFreeBusy.find(c => c.calendarId === calendarId);
+    const mockCalendar = currentMock.mockFreeBusy?.find(c => c.calendarId === calendarId);
     
     if (mockCalendar) {
       // Filter busy periods that overlap with the requested time range
@@ -111,7 +111,7 @@ export async function mockListEvents(
     throw new Error('No mock data set');
   }
 
-  let events = currentMock.mockEvents || [];
+  let events = currentMock.mockEvents ?? [];
 
   // Filter events that overlap with the requested time range
   events = events.filter(event => {
