@@ -344,6 +344,21 @@ async function runCase(testCase) {
       newEndISO: end,
       timeZone: GCAL_TZ,
     };
+
+    // Prepare headers with authentication
+    const headers = { 'Content-Type': 'application/json' };
+    
+    if (!MOCK_MODE) {
+      try {
+        // Try to load access token from token.json
+        const tokenData = JSON.parse(await import('fs').then(fs => fs.readFileSync('token.json', 'utf8')));
+        if (tokenData.access_token) {
+          headers['Cookie'] = `access_token=${tokenData.access_token}`;
+        }
+      } catch (error) {
+        console.warn('⚠️  No token.json found, API calls may fail');
+      }
+    }
     
     // Measure latency
     startTime = Date.now();
@@ -365,7 +380,7 @@ async function runCase(testCase) {
     } else {
       response = await fetch(`${BASE_URL}/api/reschedule`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify(requestBody),
       });
       endTime = Date.now();

@@ -1,4 +1,6 @@
+# Google Calendar API credentials
 credentials.json
+oauth-credentials.json
 token.json
 .env.local
 node_modules/
