@@ -17,7 +17,7 @@ A modern web application for rescheduling Google Calendar events with intelligen
 https://www.loom.com/share/6dda9645279943b2aa64c3215bbb2c28
 
 ### 2. Simulation suite demo
-[need to record it]
+https://www.loom.com/share/050f07d2685840fc8e5a254667baaec9
 
 ## Quick Start
 
